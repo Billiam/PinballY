@@ -202,6 +202,7 @@ namespace ConfigVars
 	static const TCHAR *WheelRadius = _T("Wheel.Radius");
 	static const TCHAR *WheelAngle = _T("Wheel.Angle");
 	static const TCHAR* WheelRotateImages = _T("Wheel.RotateImages");
+	static const TCHAR* WheelOffsetAngle = _T("Wheel.OffsetAngle");
 	static const TCHAR *WheelImageWidth = _T("Wheel.ImageWidth");
 	static const TCHAR *WheelXSelected = _T("Wheel.XSelected");
 	static const TCHAR *WheelYSelected = _T("Wheel.YSelected");
@@ -4766,7 +4767,7 @@ bool PlayfieldView::OnCommandImpl(int cmd, int source, HWND hwndControl)
 
 	case ID_REMOVE_FAVORITE:
 		if (auto game = GameList::Get()->GetNthGame(0); 
-		    IsGameValid(game) && GameList::Get()->IsFavorite(game))
+			IsGameValid(game) && GameList::Get()->IsFavorite(game))
 		{
 			// un-set the favorite flag on the game
 			GameList *gl = GameList::Get();
@@ -5065,7 +5066,7 @@ bool PlayfieldView::OnCommandImpl(int cmd, int source, HWND hwndControl)
 	}
 
 	// not handled
-    return __super::OnCommand(cmd, source, hwndControl);
+	return __super::OnCommand(cmd, source, hwndControl);
 }
 
 bool PlayfieldView::HandleSysKeyEvent(BaseWin *win, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -5266,11 +5267,11 @@ void PlayfieldView::ShowAboutBox()
 		return;
 
 	// load the About Box background image
-    std::unique_ptr<Gdiplus::Bitmap> bkg(GPBitmapFromPNG(IDB_ABOUTBOX));
+	std::unique_ptr<Gdiplus::Bitmap> bkg(GPBitmapFromPNG(IDB_ABOUTBOX));
 	
 	// create the sprite
 	popupSprite.Attach(new Sprite());
-    Application::InUiErrorHandler eh;
+	Application::InUiErrorHandler eh;
 	bool ok = popupSprite->Load(bkg->GetWidth(), bkg->GetHeight(), [&bkg, this](HDC hdc, HBITMAP bmp)
 	{
 		// set up GDI+ on the memory DC
@@ -5278,7 +5279,7 @@ void PlayfieldView::ShowAboutBox()
 
 		// draw the background
 		if (bkg != nullptr)
-            g.DrawImage(bkg.get(), 0, 0);
+			g.DrawImage(bkg.get(), 0, 0);
 
 		// figure the bounding box for the text
 		const float margin = 20.0f;
@@ -5956,7 +5957,7 @@ void PlayfieldView::ShowFlyer(int pageNumber)
 	SIZE pixSize = { (int)(normalizedSize.x * szLayout.cx), (int)(normalizedSize.y * szLayout.cy) };
 
 	// load the image at the calculated size
-    Application::InUiErrorHandler eh;
+	Application::InUiErrorHandler eh;
 	popupSprite.Attach(new Sprite());
 	if (!popupSprite->Load(flyer->c_str(), normalizedSize, pixSize, hWnd, eh))
 	{
@@ -7469,7 +7470,7 @@ void PlayfieldView::JsHtmlLayoutDraw(JsValueRef self, JsValueRef dc, JavascriptE
 		GetRect(rcLayout, jsrcLayout);
 		GetRect(rcClip, jsrcClip);
 
-        // make sure we have a litehtml parsed document object
+		// make sure we have a litehtml parsed document object
 		if (layout->doc == nullptr)
 			return;
 
@@ -9518,7 +9519,7 @@ Sprite *PlayfieldView::LoadWheelImage(const GameListItem *game)
 	// get the path for the wheel image
 	TSTRING path;
 	bool ok = false;
-    Application::InUiErrorHandler eh;
+	Application::InUiErrorHandler eh;
 	if (IsGameValid(game) && game->GetMediaItem(path, GameListItem::wheelImageType))
 	{
 		// Get the image's native size.  Figure the sprite size based on
@@ -9624,13 +9625,13 @@ void PlayfieldView::SetWheelImagePos(Sprite *image, int n, float progress)
 	image->scale.x = image->scale.y = ratio;
 
 	// calculate the angle for this game
-	float theta = float(n) * wheel.angle;
+	float theta = float(n) * wheel.angle + wheel.offsetAngle;
 
 	// adjust for the travel distance
 	theta -= progress * wheel.angle * fabs(float(animWheelDistance));
 
 	// calculate the new position
-	image->offset.x = wheel.radius * sinf(theta);
+	image->offset.x = wheel.xCenter + wheel.radius * sinf(theta);
 	image->offset.y = wheel.yCenter + wheel.radius * cosf(theta);
 	image->offset.z = 3.0f - fabs(n - progress);
 
@@ -9651,12 +9652,14 @@ void PlayfieldView::SetWheelImagePos(Sprite *image, int n, float progress)
 	{
 		// Outgoing center image
 		image->scale.x = image->scale.y = 1.0f - (1.0f - ratio)*ramp;
+		image->offset.x = wheel.xSelected - (wheel.xSelected - image->offset.x)*ramp;
 		image->offset.y = wheel.ySelected - (wheel.ySelected - image->offset.y)*ramp;
 	}
 	else if (n == animWheelDistance)
 	{
 		// Animation target - incoming center image
 		image->scale.x = image->scale.y = ratio + (1.0f - ratio)*ramp;
+		image->offset.x += (wheel.xSelected - image->offset.x)*ramp;
 		image->offset.y += (wheel.ySelected - image->offset.y)*ramp;
 	}
 
@@ -11305,7 +11308,7 @@ void PlayfieldView::ShowMenu(const std::list<MenuItemDesc> &items, const WCHAR *
 	}
 
 	// create the background
-    Application::InUiErrorHandler eh;
+	Application::InUiErrorHandler eh;
 	if (!m->sprBkg->Load(boxWid, menuHt, [this, boxWid, menuHt, borderWidth](HDC hdc, HBITMAP hbmp) 
 	{
 		// fill the background
@@ -11343,7 +11346,7 @@ void PlayfieldView::ShowMenu(const std::list<MenuItemDesc> &items, const WCHAR *
 		[this, boxWid, menuHt, &symfont, &arrowFont, &items, &m, 
 		lineHt, spacerHt, yPadding, borderWidth, nPagedItems, nItemsPerPage, &tformat,
 		upArrow, downArrow, subMenuArrow, promptHt, &rcLayout, flags]
-	    (HDC hdc, HBITMAP hbmp)
+		(HDC hdc, HBITMAP hbmp)
 	{
 		// start just below the top border
 		int y = borderWidth;
@@ -13580,6 +13583,7 @@ void PlayfieldView::OnConfigChange()
 	wheel.radius = cfg->GetFloat(ConfigVars::WheelRadius, 914.0f / 1920.0f);
 	wheel.angle = cfg->GetFloat(ConfigVars::WheelAngle, 0.25f);
 	wheel.rotateImages = cfg->GetBool(ConfigVars::WheelRotateImages, false);
+	wheel.offsetAngle = cfg->GetFloat(ConfigVars::WheelOffsetAngle, 0.0f);
 	wheel.imageWidth = cfg->GetFloat(ConfigVars::WheelImageWidth, 0.14f);
 	wheel.xSelected = cfg->GetFloat(ConfigVars::WheelXSelected, 0.0f);
 	wheel.ySelected = cfg->GetFloat(ConfigVars::WheelYSelected, -0.07135f);
@@ -16843,7 +16847,7 @@ void PlayfieldView::ShowGameCategoriesMenu(GameCategory *curSelection, bool resh
 	{
 		// include all of the category filters except "uncategorized"
 		if (auto c = dynamic_cast<const GameCategory*>(f);
-		    c != nullptr && dynamic_cast<const NoCategory*>(f) == nullptr)
+			c != nullptr && dynamic_cast<const NoCategory*>(f) == nullptr)
 			allCats.push_back(c);
 	}
 
@@ -17032,7 +17036,7 @@ void PlayfieldView::EditCategories()
 					for (auto f : GameList::Get()->GetFilters())
 					{
 						if (auto cat = dynamic_cast<GameCategory*>(f); 
-						    cat != nullptr && dynamic_cast<NoCategory*>(f) == nullptr)
+							cat != nullptr && dynamic_cast<NoCategory*>(f) == nullptr)
 							ListBox_AddString(lb, cat->name.c_str());
 					}
 				}

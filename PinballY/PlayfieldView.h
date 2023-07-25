@@ -1550,6 +1550,7 @@ protected:
 		float radius;		// wheel circle radius (WHEEL_R)
 		float angle;		// angle between games (WHEEL_DTHETA)
 		bool rotateImages;	// whether wheel images are rotated during navigation
+		float offsetAngle;	// wheel start rotation
 		float imageWidth;	// target width of main icon image (WHEEL_IMAGE_WIDTH)
 		float xSelected;	// center image x location at idle
 		float ySelected;	// center image y location at idle (WHEEL_Y0)
@@ -1563,6 +1564,7 @@ protected:
 				&& this->radius == other.radius
 				&& this->angle == other.angle
 				&& this->rotateImages == other.rotateImages
+				&& this->offsetAngle == other.offsetAngle
 				&& this->imageWidth == other.imageWidth
 				&& this->xSelected == other.xSelected
 				&& this->ySelected == other.ySelected;
@@ -1576,6 +1578,7 @@ protected:
 			if (yCenter == INFINITY) yCenter = defaults.yCenter;
 			if (radius == INFINITY) radius = defaults.radius;
 			if (angle == INFINITY) angle = defaults.angle;
+			if (offsetAngle == INFINITY) offsetAngle = defaults.offsetAngle;
 			if (imageWidth == INFINITY) imageWidth = defaults.imageWidth;
 			if (xSelected == INFINITY) xSelected = defaults.xSelected;
 			if (ySelected == INFINITY) ySelected = defaults.ySelected;
