@@ -73,13 +73,18 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: PinballY.msi
-          path: Builds/PinballY-*.msi
+          path: |
+            Builds/PinballY-*.msi
+            !Builds/PinballY-64bit-*
 
       - name: 'Upload 32bit zip'
         uses: actions/upload-artifact@v3
         with:
           name: PinballY.zip
-          path: Builds/PinballY-*.zip
+          path: |
+            Builds/PinballY-*.zip
+            !Builds/PinballY-64bit-*
+            !Builds/PinballY-Min-*
 
       - name: 'Upload 64bit installer'
         uses: actions/upload-artifact@v3
@@ -91,7 +96,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: PinballY-64bit.zip
-          path: Builds/PinballY-64bit-*.zip
+          path: |
+            Builds/PinballY-64bit-*.zip
+            !Builds/PinballY-64bit-Min-*
 
       - name: 'Upload 32bit zip without dependencies'
         uses: actions/upload-artifact@v3
