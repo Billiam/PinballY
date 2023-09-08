@@ -3,7 +3,6 @@
 @rem  Run a full clean build of the release version in Visual studio
 @rem  before running this script.  See Notes\Release Checklist.txt.
 @rem
-@echo off
 
 rem create folders
 if not exist Builds mkdir Builds
@@ -44,21 +43,21 @@ rem  the delta between Min and Full.  (The manifest files are just
 rem  listings of the files to include in the ZIPs, one per line.
 rem  Each line can also contain zip option flags as needed.)
 if exist %ReleaseZipFull% del %ReleaseZipFull%
-for /f "delims=" %%i in (ReleaseManifestExe32.txt) do zip %ReleaseZipFull% %%i
-for /f "delims=" %%i in (ReleaseManifestBase.txt) do zip %ReleaseZipFull% %%i
-for /f "delims=" %%i in (ReleaseManifestVLC32.txt) do zip %ReleaseZipFull% %%i
-for /f "delims=" %%i in (ReleaseManifestFFmpeg.txt) do zip %ReleaseZipFull% %%i
-for /f "delims=" %%i in (ReleaseManifestFull.txt) do zip %ReleaseZipFull% %%i
+for /f "delims=" %%i in (ReleaseManifestExe32.txt) do 7z a -tzip %ReleaseZipFull% %%i
+for /f "delims=" %%i in (ReleaseManifestBase.txt) do 7z a -tzip %ReleaseZipFull% %%i
+for /f "delims=" %%i in (ReleaseManifestVLC32.txt) do 7z a -tzip %ReleaseZipFull% %%i
+for /f "delims=" %%i in (ReleaseManifestFFmpeg.txt) do 7z a -tzip %ReleaseZipFull% %%i
+for /f "delims=" %%i in (ReleaseManifestFull.txt) do 7z a -tzip %ReleaseZipFull% %%i
 
 rem  7-zip needs special handling because of its path setup
 move 7-zip\x86\7z.dll 7-zip
-zip %ReleaseZipFull% 7-zip\7z.dll
+7z a -tzip %ReleaseZipFull% 7-zip\7z.dll
 move 7-zip\7z.dll 7-zip\x86
 
 rem  Build the "Min" ZIP
 if exist %ReleaseZipMin% del %ReleaseZipMin%
-for /f "delims=" %%i in (ReleaseManifestExe32.txt) do zip %ReleaseZipMin% %%i
-for /f "delims=" %%i in (ReleaseManifestBase.txt) do zip %ReleaseZipMin% %%i
+for /f "delims=" %%i in (ReleaseManifestExe32.txt) do 7z a -tzip %ReleaseZipMin% %%i
+for /f "delims=" %%i in (ReleaseManifestBase.txt) do 7z a -tzip %ReleaseZipMin% %%i
 
 
 rem  Rename the .\ffmpeg64 folder to plain .\ffmpeg for the ZIP build
@@ -67,15 +66,15 @@ move ffmpeg64 ffmpeg
 
 rem  Build the Full 64-bit ZIP
 if exist %ReleaseZipFull64% del %ReleaseZipFull64%
-for /f "delims=" %%i in (ReleaseManifestExe64.txt) do zip %ReleaseZipFull64% %%i
-for /f "delims=" %%i in (ReleaseManifestBase.txt) do zip %ReleaseZipFull64% %%i
-for /f "delims=" %%i in (ReleaseManifestVLC64.txt) do zip %ReleaseZipFull64% %%i
-for /f "delims=" %%i in (ReleaseManifestFFmpeg.txt) do zip %ReleaseZipFull64% %%i
-for /f "delims=" %%i in (ReleaseManifestFull.txt) do zip %ReleaseZipFull64% %%i
+for /f "delims=" %%i in (ReleaseManifestExe64.txt) do 7z a -tzip %ReleaseZipFull64% %%i
+for /f "delims=" %%i in (ReleaseManifestBase.txt) do 7z a -tzip %ReleaseZipFull64% %%i
+for /f "delims=" %%i in (ReleaseManifestVLC64.txt) do 7z a -tzip %ReleaseZipFull64% %%i
+for /f "delims=" %%i in (ReleaseManifestFFmpeg.txt) do 7z a -tzip %ReleaseZipFull64% %%i
+for /f "delims=" %%i in (ReleaseManifestFull.txt) do 7z a -tzip %ReleaseZipFull64% %%i
 
 rem  7-zip needs special handling because of its path setup
 move 7-zip\x64\7z.dll 7-zip
-zip %ReleaseZipFull64% 7-zip\7z.dll
+7z a -tzip %ReleaseZipFull64% 7-zip\7z.dll
 move 7-zip\7z.dll 7-zip\x64
 
 rem  Put renamed 64-bit folders back as they were
@@ -84,8 +83,8 @@ move ffmpeg32 ffmpeg
 
 rem  Build the "Min" 64-bit ZIP
 if exist %ReleaseZipMin64% del %ReleaseZipMin64%
-for /f "delims=" %%i in (ReleaseManifestExe64.txt) do zip %ReleaseZipMin64% %%i
-for /f "delims=" %%i in (ReleaseManifestBase.txt) do zip %ReleaseZipMin64% %%i
+for /f "delims=" %%i in (ReleaseManifestExe64.txt) do 7z a -tzip %ReleaseZipMin64% %%i
+for /f "delims=" %%i in (ReleaseManifestBase.txt) do 7z a -tzip %ReleaseZipMin64% %%i
 
 
 rem  Copy the MSI installers

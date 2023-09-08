@@ -1,5 +1,5 @@
--j release\PinballY.exe
--j "release\PinballY Admin Mode.exe"
--j "release\PinballY Watchdog.exe"
--j release\OptionsDialog.dll
--j release\ChakraCore.dll
+.\release\PinballY.exe
+".\release\PinballY Admin Mode.exe"
+".\release\PinballY Watchdog.exe"
+.\release\OptionsDialog.dll
+.\release\ChakraCore.dll
