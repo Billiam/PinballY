@@ -15,7 +15,6 @@ rem  Get the date in YYYYMMDD format, to use as a filename suffix
 rem  for the release ZIP files
 set SysDateTime=
 for /f "skip=1" %%i in ('wmic os get localdatetime') do if not defined SysDateTime set SysDateTime=%%i
-set ReleaseDate=%SysDateTime:~0,8%
 
 rem  Form the names of the release ZIP files.  The base file is
 rem  the full archive with everything needed for a fresh install.
@@ -24,12 +23,12 @@ rem  the separate third-party dependencies; users with a prior
 rem  version installed can use this to install an update without
 rem  needlessly re-copying all of the dependencies, which don't
 rem  usually change from release to release.
-set ReleaseZipFull=Builds\PinballY-%ReleaseDate%.zip
-set ReleaseZipMin=Builds\PinballY-Min-%ReleaseDate%.zip
+set ReleaseZipFull=Builds\PinballY.zip
+set ReleaseZipMin=Builds\PinballY-Min.zip
 
 rem  64-bit versions
-set ReleaseZipFull64=Builds\PinballY-64bit-%ReleaseDate%.zip
-set ReleaseZipMin64=Builds\PinballY-64bit-Min-%ReleaseDate%.zip
+set ReleaseZipFull64=Builds\PinballY-64bit.zip
+set ReleaseZipMin64=Builds\PinballY-64bit-Min.zip
 
 
 rem  Make sure our custom FFMPEG manifests are in place
@@ -88,8 +87,8 @@ for /f "delims=" %%i in (ReleaseManifestBase.txt) do 7z a -tzip %ReleaseZipMin64
 
 
 rem  Copy the MSI installers
-copy "WixSetup\bin\x86-Release\PinballY Setup.msi" Builds\PinballY-%ReleaseDate%.msi
-copy "WixSetup\bin\x64-Release\PinballY Setup.msi" Builds\PinballY-64bit-%ReleaseDate%.msi
+copy "WixSetup\bin\x86-Release\PinballY Setup.msi" Builds\PinballY.msi
+copy "WixSetup\bin\x64-Release\PinballY Setup.msi" Builds\PinballY-64bit.msi
 
 rem  Copy the release notes
 copy /y VersionHistory.txt Builds\*.*
