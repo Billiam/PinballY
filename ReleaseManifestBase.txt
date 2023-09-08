@@ -1,10 +1,10 @@
 assets
 Media\Readme.txt
 Media\Transparent.png
-"Media\Button Sounds"
-"Media\Images"
-"Media\Startup Videos"
-"Media\Videos"
+"Media\Button Sounds\"
+"Media\Images\"
+"Media\Startup Videos\"
+"Media\Videos\"
 Help\*
 Help\highlightjs\*
 Help\highlightjs\styles\*

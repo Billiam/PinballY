@@ -59,6 +59,13 @@ jobs:
         run: |
           msbuild PinballY.sln -p:Configuration=Release -p:Platform=x64
 
+      - name: Create empty directories
+        run: |
+          mkdir "Media\Button Sounds"
+          mkdir "Media\Images"
+          mkdir "Media\Startup Videos"
+          mkdir "Media\Videos"
+
       - name: Create release
         run: ./release.bat
 
@@ -66,34 +73,34 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: PinballY.msi
-          path: Builds/PinballY.msi
+          path: Builds/PinballY-*.msi
 
       - name: 'Upload 32bit zip'
         uses: actions/upload-artifact@v3
         with:
           name: PinballY.zip
-          path: Builds/PinballY.zip
+          path: Builds/PinballY-*.zip
 
       - name: 'Upload 64bit installer'
         uses: actions/upload-artifact@v3
         with:
           name: PinballY-64bit.msi
-          path: Builds/PinballY-64bit.msi
+          path: Builds/PinballY-64bit-*.msi
 
       - name: 'Upload 64bit zip'
         uses: actions/upload-artifact@v3
         with:
           name: PinballY-64bit.zip
-          path: Builds/PinballY-64bit.zip
+          path: Builds/PinballY-64bit-*.zip
 
       - name: 'Upload 32bit zip without dependencies'
         uses: actions/upload-artifact@v3
         with:
           name: PinballY-Min.zip
-          path: Builds/PinballY-Min.zip
+          path: Builds/PinballY-Min-*.zip
 
       - name: 'Upload 64bit zip without dependencies'
         uses: actions/upload-artifact@v3
         with:
           name: PinballY-64bit-Min.zip
-          path: Builds/PinballY-64bit-Min.zip
+          path: Builds/PinballY-64bit-Min-*.zip
