@@ -1,17 +1,17 @@
--r assets
+assets
 Media\Readme.txt
 Media\Transparent.png
-"Media\Button Sounds"
-"Media\Images"
-"Media\Startup Videos"
-"Media\Videos"
+"Media\Button Sounds\"
+"Media\Images\"
+"Media\Startup Videos\"
+"Media\Videos\"
 Help\*
 Help\highlightjs\*
 Help\highlightjs\styles\*
 Scripts\Scripts_Folder.txt
 Scripts\System\*.js
 Farsight\*.pinballArcade
--j release_temp\README.txt
+.\release_temp\README.txt
 DefaultSettings.txt
 License.txt
 "Third Party Licenses.txt"

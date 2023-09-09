@@ -1,0 +1,113 @@
+name: Build Artifacts
+
+on:
+  push:
+    branches:
+      - master
+      - feature/gh-actions
+      - release/custom
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    env:
+      DXSDK_DIR: '${{ github.workspace }}/DXSDK/'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache ipdb files
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/*.ipdb
+          key: ipdb-0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x86
+
+      - name: Install DirectX SDK
+        run: |
+          curl -sL https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe -o DXSDK_Jun10.exe
+          7z x DXSDK_Jun10.exe DXSDK/Include -otmp
+          7z x DXSDK_Jun10.exe DXSDK/Lib -otmp
+          mv tmp/DXSDK DXSDK
+
+      - name: Install Windows SDK
+        uses: GuillaumeFalourd/setup-windows10-sdk-action@v1.11
+        with:
+          sdk-version: 16299
+
+      - name: Install Wix Toolkit
+        run: |
+          Invoke-WebRequest -UseBasicParsing -Uri https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311.exe -OutFile wix311.exe
+          & ".\wix311.exe" "/q"
+
+      - name: Build 32-bit
+        run: |
+          msbuild PinballY.sln -p:Configuration=Release -p:Platform=x86
+
+      - name: Build 64-bit
+        run: |
+          msbuild PinballY.sln -p:Configuration=Release -p:Platform=x64
+
+      - name: Create empty directories
+        run: |
+          mkdir "Media\Button Sounds"
+          mkdir "Media\Images"
+          mkdir "Media\Startup Videos"
+          mkdir "Media\Videos"
+
+      - name: Create release
+        run: ./release.bat
+
+      - name: 'Upload 32bit installer'
+        uses: actions/upload-artifact@v3
+        with:
+          name: PinballY.msi
+          path: |
+            Builds/PinballY-*.msi
+            !Builds/PinballY-64bit-*
+
+      - name: 'Upload 32bit zip'
+        uses: actions/upload-artifact@v3
+        with:
+          name: PinballY.zip
+          path: |
+            Builds/PinballY-*.zip
+            !Builds/PinballY-64bit-*
+            !Builds/PinballY-Min-*
+
+      - name: 'Upload 64bit installer'
+        uses: actions/upload-artifact@v3
+        with:
+          name: PinballY-64bit.msi
+          path: Builds/PinballY-64bit-*.msi
+
+      - name: 'Upload 64bit zip'
+        uses: actions/upload-artifact@v3
+        with:
+          name: PinballY-64bit.zip
+          path: |
+            Builds/PinballY-64bit-*.zip
+            !Builds/PinballY-64bit-Min-*
+
+      - name: 'Upload 32bit zip without dependencies'
+        uses: actions/upload-artifact@v3
+        with:
+          name: PinballY-Min.zip
+          path: Builds/PinballY-Min-*.zip
+
+      - name: 'Upload 64bit zip without dependencies'
+        uses: actions/upload-artifact@v3
+        with:
+          name: PinballY-64bit-Min.zip
+          path: Builds/PinballY-64bit-Min-*.zip
